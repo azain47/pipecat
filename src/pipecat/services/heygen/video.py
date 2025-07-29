@@ -69,9 +69,7 @@ class HeyGenVideoService(AIService):
         *,
         api_key: str,
         session: aiohttp.ClientSession,
-        session_request: NewSessionRequest = NewSessionRequest(
-            avatar_id="Shawn_Therapist_public"
-        ),
+        session_request: NewSessionRequest = NewSessionRequest(avatar_id="Shawn_Therapist_public"),
         **kwargs,
     ) -> None:
         """Initialize the HeyGen video service.

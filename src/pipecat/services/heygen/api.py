@@ -24,6 +24,7 @@ class AvatarQuality(str, Enum):
     medium = "medium"
     high = "high"
 
+
 class VideoEncoding(str, Enum):
     """Enum representing the video encoding."""
 
@@ -42,7 +43,15 @@ class VoiceEmotion(str, Enum):
 
 
 class ElevenLabsSettings(BaseModel):
-    """Settings for ElevenLabs voice configuration."""
+    """Settings for ElevenLabs voice configuration.
+
+    Parameters:
+        stability (Optional[float]): Stability of the voice synthesis.
+        similarity_boost (Optional[float]): Adjustment for similarity in voice performance.
+        model_id (Optional[str]): Identifier for the ElevenLabs model to use.
+        style (Optional[int]): Style metric to apply for the voice.
+        use_speaker_boost (Optional[bool]): Flag to enable speaker boost.
+    """
 
     stability: Optional[float] = None
     similarity_boost: Optional[float] = None
@@ -52,7 +61,14 @@ class ElevenLabsSettings(BaseModel):
 
 
 class VoiceSettings(BaseModel):
-    """Voice configuration settings."""
+    """Voice configuration settings.
+
+    Parameters:
+        voice_id (Optional[str]): ID of the voice to be used.
+        rate (Optional[float]): Speaking rate for the voice.
+        emotion (Optional[VoiceEmotion]): Emotion tone for the voice.
+        elevenlabs_settings (Optional[ElevenLabsSettings]): Details for ElevenLabs configuration.
+    """
 
     voice_id: Optional[str] = Field(None, alias="voiceId")
     rate: Optional[float] = None
@@ -61,7 +77,19 @@ class VoiceSettings(BaseModel):
 
 
 class NewSessionRequest(BaseModel):
-    """Requesting model for creating a new HeyGen session."""
+    """Requesting model for creating a new HeyGen session.
+
+    Parameters:
+        quality (Optional[AvatarQuality]): Desired quality of the avatar.
+        avatar_id (Optional[str]): Unique identifier for the avatar.
+        voice (Optional[VoiceSettings]): Voice configurations for the session.
+        video_encoding (Optional[VideoEncoding]): Desired encoding for the video stream.
+        knowledge_id (Optional[str]): Identifier for the knowledge base (if applicable).
+        knowledge_base (Optional[str]): Details of any external knowledge base.
+        version (Literal["v2"]): API version to use.
+        disable_idle_timeout (Optional[bool]): Flag to disable automatic idle timeout.
+        activity_idle_timeout (Optional[int]): Timeout in seconds for activity-based idle detection.
+    """
 
     quality: Optional[AvatarQuality] = None
     avatar_id: Optional[str] = None
@@ -75,7 +103,14 @@ class NewSessionRequest(BaseModel):
 
 
 class HeyGenSession(BaseModel):
-    """Response model for a HeyGen session."""
+    """Response model for a HeyGen session.
+
+    Parameters:
+        session_id (str): Unique identifier for the streaming session.
+        access_token (str): Token for accessing the session securely.
+        realtime_endpoint (str): Real-time communication endpoint URL.
+        url (str): Direct URL for the session.
+    """
 
     session_id: str
     access_token: str
@@ -118,16 +153,16 @@ class HeyGenApi:
         """Make a POST request to the HeyGen API.
 
         Args:
-            path: API endpoint path
-            params: JSON-serializable parameters
-            expect_data: Whether to expect and extract 'data' field from response (default: True)
+            path: API endpoint path.
+            params: JSON-serializable parameters.
+            expect_data: Whether to expect and extract 'data' field from response (default: True).
 
         Returns:
-            Parsed JSON response data
+            Parsed JSON response data.
 
         Raises:
-            HeygenApiError: If the API response is not successful or data is missing when expected
-            aiohttp.ClientError: For network-related errors
+            HeygenApiError: If the API response is not successful or data is missing when expected.
+            aiohttp.ClientError: For network-related errors.
         """
         url = f"{self.BASE_URL}{path}"
         headers = {
@@ -162,10 +197,10 @@ class HeyGenApi:
         https://docs.heygen.com/reference/new-session
 
         Args:
-            request_data: Session configuration parameters
+            request_data: Session configuration parameters.
 
         Returns:
-            Session information including ID and access token
+            Session information, including ID and access token.
         """
         params = {
             "quality": request_data.quality,
@@ -196,13 +231,13 @@ class HeyGenApi:
         https://docs.heygen.com/reference/start-session
 
         Args:
-            session_id: ID of the session to start
+            session_id: ID of the session to start.
 
         Returns:
-            Response data from the start session API call
+            Response data from the start session API call.
 
         Raises:
-            ValueError: If session ID is not set
+            ValueError: If session ID is not set.
         """
         if not session_id:
             raise ValueError("Session ID is not set. Call new_session first.")
@@ -218,13 +253,13 @@ class HeyGenApi:
         https://docs.heygen.com/reference/close-session
 
         Args:
-            session_id: ID of the session to stop
+            session_id: ID of the session to stop.
 
         Returns:
-            Response data from the stop session API call
+            Response data from the stop session API call.
 
         Raises:
-            ValueError: If session ID is not set
+            ValueError: If session ID is not set.
         """
         if not session_id:
             raise ValueError("Session ID is not set. Call new_session first.")
