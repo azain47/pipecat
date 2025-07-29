@@ -245,7 +245,7 @@ class HeyGenClient:
         """Handle an event from HeyGen websocket."""
         event_type = event.get("type")
         if event_type == "agent.state":
-            logger.info(f"HeyGenClient ws received agent status: {event}")
+            logger.debug(f"HeyGenClient ws received agent status: {event}")
         else:
             logger.error(f"HeyGenClient ws received unknown event: {event_type}")
 
@@ -392,7 +392,7 @@ class HeyGenClient:
             participant_id: Identifier of the participant to capture audio from
             callback: Async function to handle received audio frames
         """
-        logger.info(f"capture_participant_audio: {participant_id}")
+        logger.debug(f"capture_participant_audio: {participant_id}")
         self._audio_frame_callback = callback
         if self._audio_task is not None:
             logger.warning(
@@ -405,7 +405,7 @@ class HeyGenClient:
             participant = self._livekit_room.remote_participants[participant_id]
             for track_pub in participant.track_publications.values():
                 if track_pub.kind == rtc.TrackKind.KIND_AUDIO and track_pub.track is not None:
-                    logger.info(f"Starting audio capture for existing track: {track_pub.sid}")
+                    logger.debug(f"Starting audio capture for existing track: {track_pub.sid}")
                     audio_stream = rtc.AudioStream(track_pub.track)
                     self._audio_task = self._task_manager.create_task(
                         self._process_audio_frames(audio_stream), name="HeyGenClient_Receive_Audio"
@@ -419,7 +419,7 @@ class HeyGenClient:
             participant_id: Identifier of the participant to capture video from
             callback: Async function to handle received video frames
         """
-        logger.info(f"capture_participant_video: {participant_id}")
+        logger.debug(f"capture_participant_video: {participant_id}")
         self._video_frame_callback = callback
         if self._video_task is not None:
             logger.warning(
@@ -432,7 +432,7 @@ class HeyGenClient:
             participant = self._livekit_room.remote_participants[participant_id]
             for track_pub in participant.track_publications.values():
                 if track_pub.kind == rtc.TrackKind.KIND_VIDEO and track_pub.track is not None:
-                    logger.info(f"Starting video capture for existing track: {track_pub.sid}")
+                    logger.debug(f"Starting video capture for existing track: {track_pub.sid}")
                     video_stream = rtc.VideoStream(track_pub.track)
                     self._video_task = self._task_manager.create_task(
                         self._process_video_frames(video_stream), name="HeyGenClient_Receive_Video"
@@ -463,7 +463,7 @@ class HeyGenClient:
         except Exception as e:
             logger.error(f"Error processing audio frames: {e}")
         finally:
-            logger.info(f"Audio frame processing ended.")
+            logger.debug(f"Audio frame processing ended.")
 
     async def _process_video_frames(self, stream: rtc.VideoStream):
         """Process video frames from LiveKit stream."""
@@ -492,21 +492,21 @@ class HeyGenClient:
         except Exception as e:
             logger.error(f"Error processing video frames: {e}")
         finally:
-            logger.info(f"Video frame processing ended.")
+            logger.debug(f"Video frame processing ended.")
 
     async def _livekit_connect(self):
         """Connect to LiveKit room."""
         try:
-            logger.info(f"HeyGenClient livekit connecting to room URL: {self._heyGen_session.url}")
+            logger.debug(f"HeyGenClient livekit connecting to room URL: {self._heyGen_session.url}")
             self._livekit_room = rtc.Room()
 
             @self._livekit_room.on("participant_connected")
             def on_participant_connected(participant: rtc.RemoteParticipant):
-                logger.info(
+                logger.debug(
                     f"Participant connected - SID: {participant.sid}, Identity: {participant.identity}"
                 )
                 for track_pub in participant.track_publications.values():
-                    logger.info(
+                    logger.debug(
                         f"Available track - SID: {track_pub.sid}, Kind: {track_pub.kind}, Name: {track_pub.name}"
                     )
                 self._call_event_callback(
@@ -524,7 +524,7 @@ class HeyGenClient:
                     and self._video_frame_callback is not None
                     and self._video_task is None
                 ):
-                    logger.info(f"Creating video stream processor for track: {publication.sid}")
+                    logger.debug(f"Creating video stream processor for track: {publication.sid}")
                     video_stream = rtc.VideoStream(track)
                     self._video_task = self._task_manager.create_task(
                         self._process_video_frames(video_stream), name="HeyGenClient_Receive_Video"
@@ -534,7 +534,7 @@ class HeyGenClient:
                     and self._audio_frame_callback is not None
                     and self._audio_task is None
                 ):
-                    logger.info(f"Creating audio stream processor for track: {publication.sid}")
+                    logger.debug(f"Creating audio stream processor for track: {publication.sid}")
                     audio_stream = rtc.AudioStream(track)
                     self._audio_task = self._task_manager.create_task(
                         self._process_audio_frames(audio_stream), name="HeyGenClient_Receive_Audio"
@@ -546,11 +546,11 @@ class HeyGenClient:
                 publication: rtc.RemoteTrackPublication,
                 participant: rtc.RemoteParticipant,
             ):
-                logger.info(f"Track unsubscribed - SID: {publication.sid}, Kind: {track.kind}")
+                logger.debug(f"Track unsubscribed - SID: {publication.sid}, Kind: {track.kind}")
 
             @self._livekit_room.on("participant_disconnected")
             def on_participant_disconnected(participant: rtc.RemoteParticipant):
-                logger.info(
+                logger.debug(
                     f"Participant disconnected - SID: {participant.sid}, Identity: {participant.identity}"
                 )
                 self._call_event_callback(
@@ -560,22 +560,22 @@ class HeyGenClient:
             await self._livekit_room.connect(
                 self._heyGen_session.url, self._heyGen_session.access_token
             )
-            logger.info(f"Successfully connected to LiveKit room: {self._livekit_room.name}")
-            logger.info(f"Local participant SID: {self._livekit_room.local_participant.sid}")
-            logger.info(
+            logger.debug(f"Successfully connected to LiveKit room: {self._livekit_room.name}")
+            logger.debug(f"Local participant SID: {self._livekit_room.local_participant.sid}")
+            logger.debug(
                 f"Number of remote participants: {len(self._livekit_room.remote_participants)}"
             )
 
             # Log existing participants and their tracks
             for participant in self._livekit_room.remote_participants.values():
-                logger.info(
+                logger.debug(
                     f"Existing participant - SID: {participant.sid}, Identity: {participant.identity}"
                 )
                 self._call_event_callback(
                     self._callbacks.on_participant_connected, participant.identity
                 )
                 for track_pub in participant.track_publications.values():
-                    logger.info(
+                    logger.debug(
                         f"Existing track - SID: {track_pub.sid}, Kind: {track_pub.kind}, Name: {track_pub.name}"
                     )
 
@@ -586,7 +586,7 @@ class HeyGenClient:
     async def _livekit_disconnect(self):
         """Disconnect from LiveKit room."""
         try:
-            logger.info("Starting LiveKit disconnect...")
+            logger.debug("Starting LiveKit disconnect...")
             if self._video_task:
                 await self._task_manager.cancel_task(self._video_task)
                 self._video_task = None
