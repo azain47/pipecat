@@ -9,7 +9,6 @@
 This module provides integration with the HeyGen platform for creating conversational
 AI applications with avatars. It manages conversation sessions and provides real-time
 audio/video streaming capabilities through the HeyGen API.
-
 """
 
 import asyncio
@@ -51,6 +50,7 @@ class HeyGenVideoService(AIService):
     to coordinate the avatar's behavior and maintains synchronization between audio and video streams.
 
     The service supports:
+
     - Real-time avatar animation based on audio input
     - Voice activity detection for natural interactions
     - Interrupt handling for more natural conversations
