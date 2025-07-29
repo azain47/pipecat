@@ -67,6 +67,7 @@ class NewSessionRequest(BaseModel):
     avatar_id: Optional[str] = None
     voice: Optional[VoiceSettings] = None
     video_encoding: Optional[VideoEncoding] = None
+    knowledge_id: Optional[str] = None
     knowledge_base: Optional[str] = None
     version: Literal["v2"] = "v2"
     disable_idle_timeout: Optional[bool] = None
@@ -177,6 +178,7 @@ class HeyGenApi:
                     request_data.voice.elevenlabsSettings if request_data.voice else None
                 ),
             },
+            "knowledge_id": request_data.knowledge_id,
             "knowledge_base": request_data.knowledge_base,
             "version": "v2",
             "video_encoding": request_data.video_encoding,
