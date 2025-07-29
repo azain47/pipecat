@@ -35,9 +35,10 @@ from pipecat.utils.asyncio.task_manager import BaseTaskManager
 from pipecat.utils.asyncio.watchdog_queue import WatchdogQueue
 
 try:
-    import websockets
     from livekit import rtc
     from livekit.rtc._proto.video_frame_pb2 import VideoBufferType
+    from websockets.asyncio.client import connect as websocket_connect
+    from websockets.exceptions import ConnectionClosedOK
 except ModuleNotFoundError as e:
     logger.error(f"Exception: {e}")
     logger.error("In order to use HeyGen, you need to `pip install pipecat-ai[heygen]`.")
@@ -215,7 +216,7 @@ class HeyGenClient:
                 logger.debug(f"HeyGenClient ws already connected!")
                 return
             logger.debug(f"HeyGenClient ws connecting")
-            self._websocket = await websockets.connect(
+            self._websocket = await websocket_connect(
                 uri=self._heyGen_session.realtime_endpoint,
             )
             self._connected = True
@@ -235,7 +236,7 @@ class HeyGenClient:
                 await self._handle_ws_server_event(parsed_message)
             except asyncio.TimeoutError:
                 self._task_manager.task_reset_watchdog()
-            except websockets.exceptions.ConnectionClosedOK:
+            except ConnectionClosedOK:
                 break
             except Exception as e:
                 logger.error(f"Error processing WebSocket message: {e}")
