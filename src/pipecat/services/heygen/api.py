@@ -215,7 +215,7 @@ class HeyGenApi:
             },
             "knowledge_id": request_data.knowledge_id,
             "knowledge_base": request_data.knowledge_base,
-            "version": "v2",
+            "version": request_data.version,
             "video_encoding": request_data.video_encoding,
             "disable_idle_timeout": request_data.disable_idle_timeout,
             "activity_idle_timeout": request_data.activity_idle_timeout,
