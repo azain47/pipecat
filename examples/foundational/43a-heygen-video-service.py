@@ -57,7 +57,7 @@ async def run_example(transport: BaseTransport, _: argparse.Namespace, handle_si
 
         tts = CartesiaTTSService(
             api_key=os.getenv("CARTESIA_API_KEY"),
-            voice_id="a167e0f3-df7e-4d52-a9c3-f949145efdab",
+            voice_id="00967b2f-88a6-4a31-8153-110a92134b9f",
         )
 
         llm = GoogleLLMService(api_key=os.getenv("GOOGLE_API_KEY"))
@@ -67,7 +67,7 @@ async def run_example(transport: BaseTransport, _: argparse.Namespace, handle_si
         messages = [
             {
                 "role": "system",
-                "content": "You are a helpful LLM in a WebRTC call. Your goal is to demonstrate your capabilities in a succinct way. Your output will be converted to audio so don't include special characters in your answers. Respond to what the user said in a creative and helpful way.",
+                "content": "You are a helpful assistant. Your output will be converted to audio so don't include special characters in your answers. Be succinct and respond to what the user said in a creative and helpful way.",
             },
         ]
 
@@ -90,8 +90,6 @@ async def run_example(transport: BaseTransport, _: argparse.Namespace, handle_si
         task = PipelineTask(
             pipeline,
             params=PipelineParams(
-                audio_in_sample_rate=16000,
-                audio_out_sample_rate=24000,
                 enable_metrics=True,
                 enable_usage_metrics=True,
             ),
@@ -104,7 +102,7 @@ async def run_example(transport: BaseTransport, _: argparse.Namespace, handle_si
             messages.append(
                 {
                     "role": "system",
-                    "content": "Start by greeting the user and ask how you can help.",
+                    "content": "Start by saying 'Hello' and then a short greeting.",
                 }
             )
             await task.queue_frames([context_aggregator.user().get_context_frame()])

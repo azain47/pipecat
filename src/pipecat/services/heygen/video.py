@@ -70,8 +70,7 @@ class HeyGenVideoService(AIService):
         api_key: str,
         session: aiohttp.ClientSession,
         session_request: NewSessionRequest = NewSessionRequest(
-            avatarName="Shawn_Therapist_public",
-            version="v2",
+            avatar_id="Shawn_Therapist_public"
         ),
         **kwargs,
     ) -> None:

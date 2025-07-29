@@ -7,7 +7,6 @@
 """HeyGen API.
 
 API to communicate with HeyGen Streaming API.
-
 """
 
 from enum import Enum
@@ -25,6 +24,12 @@ class AvatarQuality(str, Enum):
     medium = "medium"
     high = "high"
 
+class VideoEncoding(str, Enum):
+    """Enum representing the video encoding."""
+
+    H264 = "H264"
+    VP8 = "VP8"
+
 
 class VoiceEmotion(str, Enum):
     """Enum representing different voice emotion types."""
@@ -41,6 +46,7 @@ class ElevenLabsSettings(BaseModel):
 
     stability: Optional[float] = None
     similarity_boost: Optional[float] = None
+    model_id: Optional[str] = None
     style: Optional[int] = None
     use_speaker_boost: Optional[bool] = None
 
@@ -57,16 +63,14 @@ class VoiceSettings(BaseModel):
 class NewSessionRequest(BaseModel):
     """Requesting model for creating a new HeyGen session."""
 
-    avatarName: str
     quality: Optional[AvatarQuality] = None
-    knowledgeId: Optional[str] = None
-    knowledgeBase: Optional[str] = None
+    avatar_id: Optional[str] = None
     voice: Optional[VoiceSettings] = None
-    language: Optional[str] = None
+    video_encoding: Optional[VideoEncoding] = None
+    knowledge_base: Optional[str] = None
     version: Literal["v2"] = "v2"
-    video_encoding: Literal["H264"] = "H264"
-    source: Literal["sdk"] = "sdk"
-    disableIdleTimeout: Optional[bool] = None
+    disable_idle_timeout: Optional[bool] = None
+    activity_idle_timeout: Optional[int] = None
 
 
 class HeyGenSession(BaseModel):
@@ -163,10 +167,8 @@ class HeyGenApi:
             Session information including ID and access token
         """
         params = {
-            "avatar_name": request_data.avatarName,
             "quality": request_data.quality,
-            "knowledge_base_id": request_data.knowledgeId,
-            "knowledge_base": request_data.knowledgeBase,
+            "avatar_id": request_data.avatar_id,
             "voice": {
                 "voice_id": request_data.voice.voiceId if request_data.voice else None,
                 "rate": request_data.voice.rate if request_data.voice else None,
@@ -175,11 +177,11 @@ class HeyGenApi:
                     request_data.voice.elevenlabsSettings if request_data.voice else None
                 ),
             },
-            "language": request_data.language,
+            "knowledge_base": request_data.knowledge_base,
             "version": "v2",
-            "video_encoding": "H264",
-            "source": "sdk",
-            "disable_idle_timeout": request_data.disableIdleTimeout,
+            "video_encoding": request_data.video_encoding,
+            "disable_idle_timeout": request_data.disable_idle_timeout,
+            "activity_idle_timeout": request_data.activity_idle_timeout,
         }
         session_info = await self._request("/streaming.new", params)
         print("heygen session info", session_info)
