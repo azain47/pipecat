@@ -9,7 +9,6 @@
 This module provides integration with the HeyGen platform for creating conversational
 AI applications with avatars. It manages conversation sessions and provides real-time
 audio/video streaming capabilities through the HeyGen API.
-
 """
 
 import asyncio
@@ -186,7 +185,7 @@ class HeyGenClient:
             frame: Initial configuration frame containing audio parameters
             audio_chunk_size: Audio chunk size for output processing
         """
-        if self._websocket is not None:
+        if self._websocket:
             logger.debug("heygen client already started")
             return
 
