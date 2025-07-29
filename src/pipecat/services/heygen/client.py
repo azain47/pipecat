@@ -119,6 +119,7 @@ class HeyGenClient:
         self._send_interval = 0
         self._next_send_time = 0
         self._audio_seconds_sent = 0.0
+        self._transport_ready = False
 
     async def _initialize(self):
         self._heyGen_session = await self._api.new_session(self._session_request)
@@ -312,6 +313,10 @@ class HeyGenClient:
             }
         )
 
+    def transport_ready(self) -> None:
+        """Indicates that the output transport is ready and able to receive frames."""
+        self._transport_ready = True
+
     @property
     def out_sample_rate(self) -> int:
         """Get the output sample rate.
@@ -455,7 +460,7 @@ class HeyGenClient:
                         sample_rate=audio_frame.sample_rate,
                         num_channels=1,  # HeyGen uses mono audio
                     )
-                    if self._audio_frame_callback:
+                    if self._transport_ready and self._audio_frame_callback:
                         await self._audio_frame_callback(audio_frame)
 
                 except Exception as e:
@@ -485,7 +490,7 @@ class HeyGenClient:
                     )
                     image_frame.pts = frame_event.timestamp_us // 1000  # Convert to milliseconds
 
-                    if self._video_frame_callback:
+                    if self._transport_ready and self._video_frame_callback:
                         await self._video_frame_callback(image_frame)
                 except Exception as e:
                     logger.error(f"Error processing individual video frame: {e}")

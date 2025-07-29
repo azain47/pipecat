@@ -26,6 +26,7 @@ from pipecat.frames.frames import (
     ImageRawFrame,
     OutputAudioRawFrame,
     OutputImageRawFrame,
+    OutputTransportReadyFrame,
     StartFrame,
     TTSAudioRawFrame,
     UserStartedSpeakingFrame,
@@ -224,6 +225,9 @@ class HeyGenVideoService(AIService):
             await self.push_frame(frame, direction)
         elif isinstance(frame, UserStoppedSpeakingFrame):
             await self._client.stop_agent_listening()
+            await self.push_frame(frame, direction)
+        elif isinstance(frame, OutputTransportReadyFrame):
+            self._client.transport_ready()
             await self.push_frame(frame, direction)
         elif isinstance(frame, TTSAudioRawFrame):
             await self._handle_audio_frame(frame)
