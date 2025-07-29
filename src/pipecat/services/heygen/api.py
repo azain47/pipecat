@@ -125,9 +125,9 @@ class HeygenApiError(Exception):
         """Initialize the HeyGen API error.
 
         Args:
-        message: Error message
-        status: HTTP status code
-        response_text: Raw response text from the API
+            message: Error message
+            status: HTTP status code
+            response_text: Raw response text from the API
         """
         super().__init__(message)
         self.status = status
@@ -143,8 +143,8 @@ class HeyGenApi:
         """Initialize the HeyGen API.
 
         Args:
-        api_key: HeyGen API key
-        session: Optional aiohttp client session
+            api_key: HeyGen API key
+            session: Optional aiohttp client session
         """
         self.api_key = api_key
         self.session = session
