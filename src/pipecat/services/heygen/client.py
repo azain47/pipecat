@@ -20,9 +20,6 @@ import uuid
 from typing import Awaitable, Callable, Optional
 
 import aiohttp
-import websockets
-from livekit import rtc
-from livekit.rtc._proto.video_frame_pb2 import VideoBufferType
 from loguru import logger
 from pydantic import BaseModel
 
@@ -36,6 +33,15 @@ from pipecat.services.heygen.api import HeyGenApi, HeyGenSession, NewSessionRequ
 from pipecat.transports.base_transport import TransportParams
 from pipecat.utils.asyncio.task_manager import BaseTaskManager
 from pipecat.utils.asyncio.watchdog_queue import WatchdogQueue
+
+try:
+    import websockets
+    from livekit import rtc
+    from livekit.rtc._proto.video_frame_pb2 import VideoBufferType
+except ModuleNotFoundError as e:
+    logger.error(f"Exception: {e}")
+    logger.error("In order to use HeyGen, you need to `pip install pipecat-ai[heygen]`.")
+    raise Exception(f"Missing module: {e}")
 
 HEY_GEN_SAMPLE_RATE = 24000
 
